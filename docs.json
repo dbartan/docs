@@ -19,6 +19,7 @@
               "hakkimda",
               "hizmetler",
               "portfoy",
+              "blog",
               "iletisim"
             ]
           }
@@ -33,6 +34,7 @@
               "about",
               "services",
               "portfolio",
+              "blog",
               "contact"
             ]
           }
@@ -43,5 +45,7 @@
   "logo": {
     "light": "/logo/derya-bartan-logo-light.svg",
     "dark": "/logo/derya-bartan-logo.svg"
+  },
+  "integrations": {
   }
 }
