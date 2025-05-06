@@ -1,12 +1,14 @@
-# Mintlify Starter Kit
+# Derya Bartan - Kişisel Web Sitesi
 
-Click on `Use this template` to copy the Mintlify starter kit. The starter kit contains examples including
+Bu site, Derya Bartan'ın özgeçmişi, sunduğu hizmetler, portföyü ve iletişim bilgilerini içermektedir.
 
-- Guide pages
-- Navigation
-- Customizations
-- API Reference pages
-- Use of popular components
+## Sayfalar
+- Hakkımda
+- Hizmetler
+- Portföy
+- İletişim
+
+Tüm içerik Türkçe hazırlanmıştır.
 
 ### Development
 
