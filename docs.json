@@ -23,11 +23,25 @@
             ]
           }
         ]
+      },
+      {
+        "language": "en",
+        "groups": [
+          {
+            "group": "Menu",
+            "pages": [
+              "about",
+              "services",
+              "portfolio",
+              "contact"
+            ]
+          }
+        ]
       }
     ]
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/derya-bartan-logo-light.svg",
+    "dark": "/logo/derya-bartan-logo.svg"
   }
 }
