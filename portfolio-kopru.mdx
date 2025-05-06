@@ -1,0 +1,60 @@
+---
+id: insaat-001
+title: Köprü Projesi
+yil: 2021
+coverImage: /images/kopru-cover.jpg
+description: "Şehirlerarası bağlantıyı güçlendiren, modern mühendislik teknikleriyle inşa edilen köprü projesi."
+location: "İstanbul, Türkiye"
+client: "Mega İnşaat A.Ş."
+roles:
+  - Proje Yöneticisi
+  - Saha Mühendisi
+technologies:
+  - Çelik Konstrüksiyon
+  - BIM
+  - Sismik İzolasyon
+awards:
+  - "2021 Yılının En İyi Altyapı Projesi"
+gallery:
+  - /images/kopru-1.jpg
+  - /images/kopru-2.jpg
+testimonial:
+  author: "Ayşe Yıldız, Mega İnşaat CEO"
+  text: "Zamanında ve yüksek kaliteyle tamamlanan bir proje."
+---
+
+import React from 'react'
+
+# {frontMatter.title}
+
+![Kapak Görseli]({frontMatter.coverImage})
+
+**Yıl:** {frontMatter.yil}
+
+**Açıklama:** {frontMatter.description}
+
+**Konum:** {frontMatter.location}
+
+**İşveren:** {frontMatter.client}
+
+**Roller:** {frontMatter.roles.join(', ')}
+
+**Kullanılan Teknolojiler:** {frontMatter.technologies.join(', ')}
+
+{frontMatter.awards && frontMatter.awards.length > 0 && (
+  <div><b>Ödüller:</b> {frontMatter.awards.join(', ')}</div>
+)}
+
+## Galeri
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-4">
+  {frontMatter.gallery.map((img, i) => (
+    <img key={i} src={img} alt={`Galeri ${i+1}`} className="rounded shadow" />
+  ))}
+</div>
+
+{frontMatter.testimonial && (
+  <blockquote className="border-l-4 border-blue-500 pl-4 my-4 italic text-gray-700 dark:text-gray-300">
+    "{frontMatter.testimonial.text}"
+    <footer className="mt-2">- {frontMatter.testimonial.author}</footer>
+  </blockquote>
+)}
