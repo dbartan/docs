@@ -1,0 +1,419 @@
+---
+title: Proje Yönetimi
+description: Proje oluşturma, yönetme ve ekip organizasyonu
+icon: "folder-open"
+---
+
+## Proje Nedir?
+
+Bir **Proje**, Saha Kontrol Uygulamasında tüm işlemlerin organize edildiği temel yapıdır. Her proje, bir inşaat projesini temsil eder ve içinde dokümanlar, kontrol listeleri, uygunsuzluklar ve raporlar bulunur.
+
+## Proje Anatomisi
+
+```typescript
+interface Project {
+  id: string;
+  name: string;                    // "ABC Plaza İnşaatı"
+  code: string;                    // "PRJ-001" (Unique)
+  description?: string;
+  client: string;                  // "ABC İnşaat A.Ş."
+  location: string;                // "İstanbul, Türkiye"
+  startDate: Date;
+  endDate?: Date;
+  status: ProjectStatus;           // PLANNING | IN_PROGRESS | COMPLETED | ON_HOLD
+  members: ProjectMember[];        // Ekip üyeleri
+  documents: Document[];
+  inspections: Inspection[];
+  defects: Defect[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+---
+
+## Proje Durumları
+
+<Tabs>
+  <Tab title="Planlama">
+    <Card title="PLANNING" icon="compass-drafting">
+      Proje henüz başlamamış, planlama aşamasında.
+
+      **Tipik Aktiviteler:**
+      - Proje dokümanlarının toplanması
+      - Ekip oluşturma
+      - Kalite planının hazırlanması
+      - Şablon kontrol listelerinin oluşturulması
+    </Card>
+  </Tab>
+
+  <Tab title="Devam Ediyor">
+    <Card title="IN_PROGRESS" icon="hammer">
+      Proje aktif olarak devam ediyor.
+
+      **Tipik Aktiviteler:**
+      - Günlük kontrol listeleri
+      - Uygunsuzluk kayıtları
+      - Doküman güncellemeleri
+      - İlerleme raporları
+    </Card>
+  </Tab>
+
+  <Tab title="Tamamlandı">
+    <Card title="COMPLETED" icon="circle-check">
+      Proje başarıyla tamamlanmış.
+
+      **Final Aktiviteler:**
+      - Kapanış raporları
+      - Final dokümanlar
+      - Arşivleme
+      - Lessons learned
+    </Card>
+  </Tab>
+
+  <Tab title="Beklemede">
+    <Card title="ON_HOLD" icon="pause">
+      Proje geçici olarak durdurulmuş.
+
+      **Sebepler:**
+      - İzin bekliyor
+      - Malzeme temininde gecikme
+      - Mevsimsel duruş
+      - Müşteri talebi
+    </Card>
+  </Tab>
+</Tabs>
+
+---
+
+## Proje Oluşturma
+
+### Temel Bilgiler
+
+<Steps>
+  <Step title="Proje Adı ve Kodu">
+    Proje adı ve benzersiz proje kodu girin.
+
+    ```typescript
+    name: "Viceroy Hotel & Residences Bodrum"
+    code: "PRJ-2023-001"
+    ```
+
+    <Tip>
+      Proje kodu şablonu: `PRJ-{YEAR}-{NUMBER}` (örn: PRJ-2025-042)
+    </Tip>
+  </Step>
+
+  <Step title="Müşteri ve Lokasyon">
+    Müşteri bilgileri ve proje lokasyonu.
+
+    ```typescript
+    client: "Shaker Consultancy Group"
+    location: "Yalıkavak, Bodrum, Muğla"
+    ```
+  </Step>
+
+  <Step title="Tarihler">
+    Başlangıç ve tahmini bitiş tarihleri.
+
+    ```typescript
+    startDate: new Date("2025-01-15")
+    endDate: new Date("2026-12-31")
+    ```
+
+    <Info>
+      Bitiş tarihi opsiyoneldir ve güncellenebilir.
+    </Info>
+  </Step>
+
+  <Step title="Açıklama (Opsiyonel)">
+    Proje hakkında detaylı açıklama.
+
+    ```typescript
+    description: "5 yıldızlı lüks otel ve residance projesi.
+                  Toplam 250 oda ve 180 konut.
+                  LEED Gold sertifikası hedefleniyor."
+    ```
+  </Step>
+</Steps>
+
+### API Kullanımı
+
+```typescript
+// Yeni proje oluşturma
+const { data: project } = await api.project.create.mutate({
+  name: "Viceroy Hotel Bodrum",
+  code: "PRJ-2025-001",
+  client: "Shaker Group",
+  location: "Bodrum, Muğla",
+  startDate: new Date("2025-01-15"),
+  description: "Luxury hotel project"
+});
+```
+
+---
+
+## Ekip Yönetimi
+
+### Roller ve Yetkiler
+
+<CardGroup cols={2}>
+  <Card title="Project Admin" icon="user-shield">
+    **Tam yetki**
+    - Proje ayarlarını değiştirme
+    - Ekip üyesi ekleme/çıkarma
+    - Tüm verilere erişim
+    - Silme yetkisi
+  </Card>
+
+  <Card title="QA/QC Manager" icon="clipboard-user">
+    **Kalite yönetimi**
+    - Kontrol listesi onaylama
+    - Uygunsuzluk kapatma
+    - Rapor oluşturma
+    - Doküman onaylama
+  </Card>
+
+  <Card title="Site Engineer" icon="hard-hat">
+    **Saha işlemleri**
+    - Kontrol listesi oluşturma
+    - Uygunsuzluk kaydı
+    - Doküman görüntüleme
+    - Rapor görüntüleme
+  </Card>
+
+  <Card title="Observer" icon="eye">
+    **Sadece görüntüleme**
+    - Tüm verileri görüntüleme
+    - Rapor indirme
+    - Yorum yapabilme
+    - Hiçbir değişiklik yapamaz
+  </Card>
+</CardGroup>
+
+### Ekip Üyesi Ekleme
+
+```typescript
+// Ekip üyesi ekleme
+await api.project.addMember.mutate({
+  projectId: "clx123abc",
+  userId: "user_456def",
+  role: "SITE_ENGINEER"
+});
+
+// Ekip listesini alma
+const { data: members } = await api.project.getMembers.useQuery({
+  projectId: "clx123abc"
+});
+```
+
+---
+
+## Proje Dashboard
+
+Her projenin kendi dashboard'u vardır ve şu bilgileri gösterir:
+
+### Ana Metrikler
+
+<CardGroup cols={3}>
+  <Card title="Aktif Kontroller" icon="clipboard-check">
+    Son 7 gündeki kontrol sayısı
+  </Card>
+
+  <Card title="Açık Uygunsuzluklar" icon="triangle-exclamation">
+    Çözülmemiş NCR sayısı
+  </Card>
+
+  <Card title="Doküman Sayısı" icon="file">
+    Toplam doküman sayısı
+  </Card>
+</CardGroup>
+
+### Son Aktiviteler
+
+```tsx
+// Son 10 aktivite
+- ✅ Beton dökümü kontrolü tamamlandı (2 saat önce)
+- ⚠️ Yeni uygunsuzluk kaydedildi: Demir çapları uygunsuz (5 saat önce)
+- 📄 Yeni doküman yüklendi: Revizyon_A_3.Kat_Planı.pdf (dün)
+- ✅ NCR-042 kapatıldı (2 gün önce)
+```
+
+### İlerleme Grafiği
+
+```tsx
+// Haftalık kontrol sayıları
+<LineChart data={weeklyInspections} />
+
+// Uygunsuzluk dağılımı (severity)
+<PieChart data={defectsBySeverity} />
+```
+
+---
+
+## Proje Filtreleme ve Arama
+
+### Dashboard'da Filtreleme
+
+```typescript
+// Durum bazlı filtreleme
+const { data: activeProjects } = api.project.getAll.useQuery({
+  status: "IN_PROGRESS"
+});
+
+// Çoklu filtre
+const { data: filteredProjects } = api.project.getAll.useQuery({
+  status: "IN_PROGRESS",
+  client: "Shaker Group",
+  startDate: { gte: new Date("2025-01-01") }
+});
+```
+
+### Arama
+
+```typescript
+// Proje adı veya kodu ile arama
+const { data: results } = api.project.search.useQuery({
+  query: "Bodrum"
+});
+```
+
+---
+
+## Proje Arşivleme
+
+Tamamlanan projeleri arşivleyebilirsiniz:
+
+```typescript
+await api.project.archive.mutate({
+  id: "clx123abc"
+});
+
+// Arşivlenen projeler
+const { data: archivedProjects } = api.project.getAll.useQuery({
+  archived: true
+});
+```
+
+<Warning>
+  Arşivlenen projeler sadece okunabilir. Yeni veri eklenemez.
+</Warning>
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Proje Kodlama Sistemi" icon="hashtag">
+    Tutarlı bir kodlama sistemi kullanın:
+
+    ```
+    PRJ-{YEAR}-{SEQUENCE}
+    PRJ-2025-001
+    PRJ-2025-002
+    ...
+    ```
+
+    Veya müşteri bazlı:
+
+    ```
+    {CLIENT_CODE}-{YEAR}-{NUMBER}
+    SHAKER-2025-01
+    MANDARIN-2025-02
+    ```
+  </Accordion>
+
+  <Accordion title="Ekip Organizasyonu" icon="users">
+    - Her projede en az 1 QA/QC Manager olmalı
+    - Site Engineer'lar belirli alanlara atanmalı (beton, MEP, vb.)
+    - Observer rolü müşteri temsilcileri için uygundur
+    - Roller açıkça tanımlanmalı
+  </Accordion>
+
+  <Accordion title="Durum Güncellemeleri" icon="arrows-rotate">
+    Proje durumunu düzenli güncelleyin:
+
+    - PLANNING → IN_PROGRESS: İlk saha faaliyeti başladığında
+    - IN_PROGRESS → ON_HOLD: Geçici durdurulduğunda
+    - ON_HOLD → IN_PROGRESS: Faaliyetler devam ettiğinde
+    - IN_PROGRESS → COMPLETED: Tüm kontroller tamamlandığında
+  </Accordion>
+
+  <Accordion title="Dokümantasyon" icon="book">
+    - Proje açıklamasını detaylı yazın
+    - Özel notları kaydedin
+    - Önemli tarihleri belirtin (milestone'lar)
+    - İletişim bilgilerini güncel tutun
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Sıkça Sorulan Sorular
+
+<AccordionGroup>
+  <Accordion title="Proje silinebilir mi?" icon="trash">
+    Evet, ama dikkatli olun! Proje silindiğinde:
+
+    - Tüm dokümanlar silinir
+    - Tüm kontrol listeleri silinir
+    - Tüm uygunsuzluklar silinir
+    - **Bu işlem geri alınamaz!**
+
+    Yerine projeyi **arşivlemeyi** düşünün.
+  </Accordion>
+
+  <Accordion title="Kaç proje oluşturulabilir?" icon="infinity">
+    Sınırsız! Ancak performans için:
+
+    - Tamamlanan projeleri arşivleyin
+    - Eski projeleri düzenli temizleyin
+    - Aktif proje sayısını 50'nin altında tutun
+  </Accordion>
+
+  <Accordion title="Proje kopyalanabilir mi?" icon="copy">
+    Evet, şablon olarak kullanmak için:
+
+    ```typescript
+    await api.project.duplicate.mutate({
+      sourceId: "clx123abc",
+      newName: "Yeni Proje Adı",
+      includeTemplates: true,  // Kontrol listesi şablonları
+      includeMembers: false    // Ekip üyeleri
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Projeyi başka birine devredebilir miyim?" icon="right-left">
+    Evet, proje sahibi değiştirilebilir:
+
+    ```typescript
+    await api.project.transferOwnership.mutate({
+      projectId: "clx123abc",
+      newOwnerId: "user_456def"
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## İleri Okuma
+
+<CardGroup cols={2}>
+  <Card title="Doküman Yönetimi" icon="file" href="/concepts/documents">
+    Proje dokümanlarını yönetin
+  </Card>
+
+  <Card title="Kontrol Listeleri" icon="clipboard-check" href="/concepts/inspections">
+    QA/QC kontrolleri yapın
+  </Card>
+
+  <Card title="Uygunsuzluk Yönetimi" icon="triangle-exclamation" href="/concepts/defects">
+    NCR oluşturun ve takip edin
+  </Card>
+
+  <Card title="Raporlama" icon="chart-line" href="/concepts/reports">
+    Proje raporları oluşturun
+  </Card>
+</CardGroup>
