@@ -1,399 +1,145 @@
 ---
-title: Hızlı Başlangıç
-description: Saha Kontrol Uygulamasını 5 dakikada kurun ve çalıştırın
+title: "Hızlı Başlangıç"
+description: "Saha Kontrol Uygulaması'nı kullanmaya başlayın"
 ---
 
-## Ön Gereksinimler
+## Kurulum
 
-Başlamadan önce sisteminizde aşağıdaki araçların kurulu olduğundan emin olun:
+### 1. Uygulamayı İndirin ve Kurun
 
-<CodeGroup>
+Saha Kontrol uygulamasını iOS App Store veya Google Play Store'dan indirin.
 
-```bash npm
-node --version  # v18.0.0 veya üzeri
-npm --version   # v9.0.0 veya üzeri
+### 2. Giriş Yapın
+
+Uygulamayı açtıktan sonra, kurumsal kimlik bilgilerinizle giriş yapın.
+
+```
+Email: your.email@company.com
+Şifre: your-password
 ```
 
-```bash pnpm
-node --version  # v18.0.0 veya üzeri
-pnpm --version  # v8.0.0 veya üzeri
-```
+### 3. Projenizi Seçin
 
-```bash yarn
-node --version  # v18.0.0 veya üzeri
-yarn --version  # v1.22.0 veya üzeri
-```
+Ana ekranda, çalışmak istediğiniz projeyi seçin.
 
-</CodeGroup>
+## İlk Kontrol Yapma
 
-Ayrıca ihtiyacınız olanlar:
-- **PostgreSQL** veritabanı (veya Vercel Postgres hesabı)
-- **GitHub** hesabı (OAuth için)
-- **Vercel** hesabı (deployment için, opsiyonel)
+### Adım 1: Proje Detaylarını Görüntüleyin
 
----
+1. Ana Sayfa'da bir proje seçin
+2. **Detaylar** butonuna tıklayın
+3. Proje bilgilerini ve dokümanlarını görüntüleyin
 
-## Adım 1: Projeyi Oluşturun
+### Adım 2: Dokümanları İnceleyin
 
-Create T3 App kullanarak projeyi başlatın:
+1. **Dokümanlar** sekmesine gidin
+2. İlgili kategoriyi seçin (Çizimler, Teknik Şartnameler, vb.)
+3. Dokümanı açıp inceleyin
+4. Gerekirse dokümanı indirin (çevrimdışı erişim için)
 
-<CodeGroup>
+### Adım 3: Kontrol Listesi Başlatın
 
-```bash npm
-npx create-t3-app@latest saha-kontrol
-```
+1. **Kontroller** sekmesine gidin
+2. **Yeni Kontrol** butonuna tıklayın
+3. Kontrol türünü seçin (Malzeme Kontrolü, Yöntem Kontrolü, vb.)
+4. Kontrol listesini doldurma başlayın
 
-```bash pnpm
-pnpm create t3-app saha-kontrol
-```
+### Adım 4: Kontrol Maddelerini Tamamlayın
 
-```bash yarn
-yarn create t3-app saha-kontrol
-```
+Her kontrol maddesi için:
 
-</CodeGroup>
+1. Madde açıklamasını okuyun
+2. İlgili dokümanı referans olarak kullanın
+3. Durumu seçin: **Uygun**, **Uygun Değil**, veya **Kontrol Edilmedi**
+4. Gerekirse fotoğraf çekin ve not ekleyin
+5. Ölçüm sonuçlarını girin
 
-### Seçenekleri İşaretleyin
+### Adım 5: Uygunsuzluk Kaydı (Gerekirse)
 
-Kurulum sırasında şu seçenekleri seçin:
+Eğer bir madde "Uygun Değil" ise:
 
-- ✅ TypeScript
-- ✅ Tailwind CSS
-- ✅ tRPC
-- ✅ Prisma
-- ✅ NextAuth.js
-- ✅ App Router
+1. **Uygunsuzluk Raporu** oluşturun
+2. Uygunsuzluk türünü seçin
+3. Fotoğraf çekin
+4. Sorumlu kişiye atayın
+5. Düzeltme tarihini belirleyin
 
-<Check>
-  Kurulum tamamlandığında `cd saha-kontrol` ile proje klasörüne girin.
-</Check>
+### Adım 6: Kontrol Listesini Gönderin
 
----
+1. Tüm maddeleri tamamladıktan sonra **Gönder** butonuna tıklayın
+2. Kontrol listesi sunucuya gönderilecektir
+3. Raporlarda görüntülenebilecektir
 
-## Adım 2: Bağımlılıkları Ekleyin
+## Raporları Görüntüleme
 
-Ek paketleri yükleyin:
+### Günlük Rapor
 
-```bash
-npm install @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select \
-            @radix-ui/react-tabs @radix-ui/react-toast \
-            react-hook-form @hookform/resolvers zod \
-            date-fns recharts \
-            @uploadthing/react uploadthing \
-            sonner
-```
+1. **Raporlar** sekmesine gidin
+2. **Günlük Kontrol Raporu** seçin
+3. Tarih aralığını belirleyin
+4. Raporu görüntüleyin veya PDF olarak indirin
 
-shadcn/ui bileşenlerini ekleyin:
+### Proje Özeti
 
-```bash
-npx shadcn-ui@latest init
-```
+1. **Raporlar** sekmesine gidin
+2. **Proje QA/QC Özeti** seçin
+3. Projeyi seçin
+4. Genel durumu ve istatistikleri görüntüleyin
 
-Gerekli bileşenleri yükleyin:
+## Uygunsuzluk Takibi
 
-```bash
-npx shadcn-ui@latest add button card input label select textarea \
-                                 dropdown-menu dialog tabs toast \
-                                 table badge avatar
-```
+### Açık Uygunsuzlukları Görüntüleme
 
----
+1. **Raporlar** sekmesine gidin
+2. **Uygunsuzluk Raporu** seçin
+3. Durum filtresini **Açık** olarak ayarlayın
+4. Uygunsuzlukları görüntüleyin
 
-## Adım 3: Environment Variables
+### Uygunsuzluk Kapatma
 
-`.env.example` dosyasını `.env` olarak kopyalayın:
+1. Uygunsuzluk detaylarını açın
+2. Düzeltme fotoğraflarını ekleyin
+3. Durumu **Kapalı** olarak değiştirin
+4. Kaydedin
 
-```bash
-cp .env.example .env
-```
+## Çevrimdışı Çalışma
 
-`.env` dosyasını düzenleyin:
+### Dokümanları İndirme
 
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/saha_kontrol"
+1. **Dokümanlar** sekmesine gidin
+2. İndirmek istediğiniz dokümanı açın
+3. **İndir** butonuna tıklayın
+4. Doküman cihaza kaydedilecektir
 
-# NextAuth
-NEXTAUTH_SECRET="your-super-secret-key-here"
-NEXTAUTH_URL="http://localhost:3000"
+### Çevrimdışı Kontrol Yapma
 
-# GitHub OAuth (opsiyonel)
-GITHUB_CLIENT_ID="your-github-client-id"
-GITHUB_CLIENT_SECRET="your-github-client-secret"
+1. Dokümanları önceden indirin
+2. İnternet olmayan alana gidin
+3. Kontrol listesini doldurma başlayın
+4. Veriler cihazda kaydedilecektir
+5. İnternet bağlantısı geldiğinde otomatik senkronize olacaktır
 
-# Uploadthing (dosya yükleme)
-UPLOADTHING_SECRET="your-uploadthing-secret"
-UPLOADTHING_APP_ID="your-uploadthing-app-id"
+## İpuçları ve Püf Noktaları
 
-# App Config
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-```
+- **Fotoğraf Kalitesi:** Kontrol sırasında çektiğiniz fotoğraflar raporlarda önemlidir. İyi aydınlatılmış, net fotoğraflar çekin.
+- **Notlar:** Her kontrol maddesi için detaylı notlar ekleyin. Bu, raporları daha anlaşılır hale getirir.
+- **Doküman Atıfları:** Kontrol maddelerine ilgili dokümanları atıfta bulunun. Bu, denetçilerin hızlıca referans bulmasını sağlar.
+- **Düzenli Senkronizasyon:** İnternet bağlantısı olduğunda, verilerinizin senkronize olduğundan emin olun.
 
-<Warning>
-  **Önemli:** `.env` dosyasını asla git'e commit etmeyin. `.gitignore` dosyasında olduğundan emin olun.
-</Warning>
+## Sık Sorulan Sorular
 
-### NextAuth Secret Oluşturma
+**S: Çevrimdışı olduğumda kontrol listesi doldurabilir miyim?**
 
-```bash
-openssl rand -base64 32
-```
+C: Evet! Kontrol listeleri ve uygunsuzluk raporları yerel olarak kaydedilir. İnternet bağlantısı geldiğinde otomatik senkronize olur.
 
-Çıktıyı `NEXTAUTH_SECRET` olarak kullanın.
+**S: Dokümanları nasıl indiririm?**
 
----
+C: Doküman görüntüleme ekranında **İndir** butonuna tıklayın. Doküman cihaza kaydedilecektir.
 
-## Adım 4: Prisma Schema
+**S: Raporları nasıl dışa aktarırım?**
 
-`prisma/schema.prisma` dosyasını güncelleyin:
-
-```prisma
-// prisma/schema.prisma
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  name          String
-  role          Role           @default(SITE_ENGINEER)
-  image         String?
-  phone         String?
-  title         String?
-  projects      ProjectMember[]
-  inspections   Inspection[]
-  defects       Defect[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-}
-
-enum Role {
-  SUPER_ADMIN
-  QAQC_MANAGER
-  SITE_ENGINEER
-  OBSERVER
-}
-
-model Project {
-  id          String          @id @default(cuid())
-  name        String
-  code        String          @unique
-  description String?
-  client      String
-  location    String
-  startDate   DateTime
-  endDate     DateTime?
-  status      ProjectStatus   @default(PLANNING)
-  members     ProjectMember[]
-  documents   Document[]
-  inspections Inspection[]
-  defects     Defect[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-}
-
-enum ProjectStatus {
-  PLANNING
-  IN_PROGRESS
-  COMPLETED
-  ON_HOLD
-}
-
-model ProjectMember {
-  id        String   @id @default(cuid())
-  projectId String
-  userId    String
-  role      String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@unique([projectId, userId])
-}
-
-// ... diğer modeller (Document, Inspection, Defect, Report)
-```
-
-<Tip>
-  Tam Prisma schema için [GitHub repository](https://github.com/your-org/saha-kontrol/blob/main/prisma/schema.prisma)'yi inceleyin.
-</Tip>
+C: Rapor ekranında **PDF İndir** veya **E-posta Gönder** butonlarını kullanın.
 
 ---
 
-## Adım 5: Veritabanını Oluşturun
-
-Prisma migration'larını çalıştırın:
-
-```bash
-npx prisma db push
-```
-
-Seed data ekleyin (opsiyonel):
-
-```bash
-npx prisma db seed
-```
-
-Prisma Studio ile veritabanını görüntüleyin:
-
-```bash
-npx prisma studio
-```
-
-<Check>
-  Tarayıcınızda `http://localhost:5555` adresinde Prisma Studio açılacaktır.
-</Check>
-
----
-
-## Adım 6: Uygulamayı Çalıştırın
-
-Development server'ı başlatın:
-
-<CodeGroup>
-
-```bash npm
-npm run dev
-```
-
-```bash pnpm
-pnpm dev
-```
-
-```bash yarn
-yarn dev
-```
-
-</CodeGroup>
-
-Tarayıcınızda `http://localhost:3000` adresini açın.
-
-<img src="/images/login-screen.png" alt="Login Screen" />
-
----
-
-## Adım 7: İlk Kullanıcı Oluşturun
-
-1. **Sign Up** sayfasına gidin
-2. Email ve şifrenizi girin
-3. "Kayıt Ol" butonuna tıklayın
-4. Dashboard'a yönlendirileceksiniz
-
-<Note>
-  İlk kullanıcı otomatik olarak **SUPER_ADMIN** rolü alır.
-</Note>
-
----
-
-## Adım 8: İlk Projenizi Oluşturun
-
-1. Dashboard'da "**Yeni Proje**" butonuna tıklayın
-2. Proje bilgilerini doldurun:
-   - Proje Adı: "ABC Plaza İnşaatı"
-   - Proje Kodu: "PRJ-001"
-   - Müşteri: "ABC İnşaat A.Ş."
-   - Lokasyon: "İstanbul, Türkiye"
-   - Başlangıç Tarihi: Bugünün tarihi
-3. "**Oluştur**" butonuna tıklayın
-
-<Check>
-  Tebrikler! İlk projenizi oluşturdunuz. Artık doküman yükleme, kontrol listesi oluşturma ve uygunsuzluk kaydı yapabilirsiniz.
-</Check>
-
----
-
-## Sonraki Adımlar
-
-<CardGroup cols={2}>
-  <Card
-    title="Proje Yönetimi"
-    icon="folder-open"
-    href="/concepts/projects"
-  >
-    Proje oluşturma ve yönetme hakkında daha fazla bilgi
-  </Card>
-
-  <Card
-    title="Kontrol Listesi Oluşturma"
-    icon="clipboard-check"
-    href="/guides/create-inspection"
-  >
-    İlk QA/QC kontrol listenizi oluşturun
-  </Card>
-
-  <Card
-    title="Doküman Yükleme"
-    icon="file-arrow-up"
-    href="/concepts/documents"
-  >
-    Teknik çizim ve dokümanları yönetin
-  </Card>
-
-  <Card
-    title="API Kullanımı"
-    icon="code"
-    href="/api-reference/introduction"
-  >
-    tRPC API endpoints'lerini keşfedin
-  </Card>
-</CardGroup>
-
----
-
-## Sorun Giderme
-
-<AccordionGroup>
-  <Accordion title="Database connection hatası" icon="database">
-    **Çözüm:**
-    - PostgreSQL'in çalıştığından emin olun: `pg_isready`
-    - `DATABASE_URL` değişkeninin doğru olduğunu kontrol edin
-    - Firewall ayarlarını kontrol edin
-  </Accordion>
-
-  <Accordion title="NextAuth hatası" icon="shield-exclamation">
-    **Çözüm:**
-    - `NEXTAUTH_SECRET` değişkeninin tanımlı olduğundan emin olun
-    - `NEXTAUTH_URL` değişkeninin doğru olduğunu kontrol edin
-    - Tarayıcı çerezlerini temizleyin
-  </Accordion>
-
-  <Accordion title="Dosya yükleme çalışmıyor" icon="file-exclamation">
-    **Çözüm:**
-    - Uploadthing API anahtarlarının doğru olduğunu kontrol edin
-    - Dosya boyutunun limit içinde olduğundan emin olun (max 10MB)
-    - Network bağlantınızı kontrol edin
-  </Accordion>
-
-  <Accordion title="Tailwind stilleri yüklenmiyor" icon="paintbrush">
-    **Çözüm:**
-    - `tailwind.config.ts` dosyasını kontrol edin
-    - Dev server'ı yeniden başlatın: `npm run dev`
-    - `node_modules` klasörünü silin ve yeniden yükleyin
-  </Accordion>
-</AccordionGroup>
-
----
-
-## Yardım ve Destek
-
-Hala sorun mu yaşıyorsunuz?
-
-<CardGroup cols={3}>
-  <Card title="Discord" icon="discord" href="https://discord.gg/saha-kontrol">
-    Canlı destek
-  </Card>
-
-  <Card title="GitHub Issues" icon="github" href="https://github.com/your-org/saha-kontrol/issues">
-    Bug bildirin
-  </Card>
-
-  <Card title="Email" icon="envelope" href="mailto:support@saha-kontrol.com">
-    Destek ekibi
-  </Card>
-</CardGroup>
+Daha fazla bilgi için [Temel Kavramlar](/concepts/projects) sayfasını ziyaret edin.
