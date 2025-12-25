@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Derya Bartan",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -88,6 +88,5 @@
     "light": "/logo/derya-bartan-logo-light.svg",
     "dark": "/logo/derya-bartan-logo.svg"
   },
-  "integrations": {
-  }
+  "integrations": {}
 }
