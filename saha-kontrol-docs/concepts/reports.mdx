@@ -1,0 +1,693 @@
+---
+title: Raporlama ve Analiz
+description: Otomatik rapor oluşturma, istatistikler ve Excel/PDF export
+icon: "chart-line"
+---
+
+## Rapor Sistemi
+
+**Raporlama modülü**, proje verilerinin anlamlı özetler ve görselleştirmeler halinde sunulmasını sağlar. Otomatik rapor oluşturma, Excel/PDF export ve interaktif dashboard'lar ile veri analitiği kolaylaşır.
+
+## Rapor Türleri
+
+<CardGroup cols={2}>
+  <Card title="Günlük Saha Raporu" icon="calendar-day">
+    **DAILY_SITE_REPORT**
+    - Günün aktiviteleri
+    - Yapılan kontroller
+    - Tespit edilen uygunsuzluklar
+    - Hava durumu
+    - İşçi sayısı
+    - Malzeme kullanımı
+  </Card>
+
+  <Card title="Haftalık QA/QC Özeti" icon="calendar-week">
+    **WEEKLY_QA_SUMMARY**
+    - Haftalık kontrol istatistikleri
+    - Onaylanan/reddedilen kontroller
+    - Yeni NCR'ler
+    - Kapatılan NCR'ler
+    - Trend analizi
+  </Card>
+
+  <Card title="Aylık İlerleme Raporu" icon="calendar">
+    **MONTHLY_PROGRESS**
+    - Proje ilerleme yüzdesi
+    - Kilometre taşları
+    - Bütçe kullanımı
+    - Kalite metrikleri
+    - Risk analizi
+  </Card>
+
+  <Card title="NCR Özet Raporu" icon="triangle-exclamation">
+    **NCR_SUMMARY**
+    - Toplam NCR sayısı
+    - Severity dağılımı
+    - Kategori bazlı analiz
+    - Ortalama kapanış süresi
+    - Tekrarlayan sorunlar
+  </Card>
+
+  <Card title="Kontrol Özet Raporu" icon="clipboard-check">
+    **INSPECTION_SUMMARY**
+    - Toplam kontrol sayısı
+    - Kontrol tipi dağılımı
+    - Başarı oranları
+    - Reddedilen kontroller
+    - Lokasyon bazlı analiz
+  </Card>
+
+  <Card title="Doküman Raporu" icon="file">
+    **DOCUMENT_REPORT**
+    - Toplam doküman sayısı
+    - Kategori dağılımı
+    - Versiyon geçmişi
+    - En çok erişilen dokümanlar
+  </Card>
+</CardGroup>
+
+---
+
+## Rapor Veri Yapısı
+
+```typescript
+interface Report {
+  id: string;
+  projectId: string;
+  title: string;                     // "Ocak 2025 - Aylık QA/QC Raporu"
+  type: ReportType;
+  period: string;                    // "2025-01", "2025-W03", "2025-Q1"
+  content: ReportContent;            // JSON data
+  generatedById: string;
+  generatedBy: User;
+  fileUrl?: string;                  // PDF export URL
+  excelUrl?: string;                 // Excel export URL
+  status: 'GENERATING' | 'READY' | 'FAILED';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ReportContent {
+  summary: {
+    totalInspections: number;
+    totalDefects: number;
+    totalDocuments: number;
+    // ... diğer metrikler
+  };
+  charts: {
+    inspectionsByType: ChartData;
+    defectsBySeverity: ChartData;
+    // ... diğer grafikler
+  };
+  tables: {
+    recentInspections: TableData;
+    openDefects: TableData;
+    // ... diğer tablolar
+  };
+}
+```
+
+---
+
+## Rapor Oluşturma
+
+### Manuel Rapor Oluşturma
+
+<Steps>
+  <Step title="Rapor Tipi Seçimi">
+    Oluşturulacak rapor türünü seçin.
+
+    ```tsx
+    <ReportTypeSelector
+      value={selectedType}
+      onChange={setSelectedType}
+    />
+    ```
+  </Step>
+
+  <Step title="Dönem Seçimi">
+    Rapor dönemi belirleyin.
+
+    ```tsx
+    <DateRangePicker
+      value={dateRange}
+      onChange={setDateRange}
+      presets={[
+        { label: 'Bu Hafta', value: 'this-week' },
+        { label: 'Bu Ay', value: 'this-month' },
+        { label: 'Son 30 Gün', value: 'last-30-days' },
+        { label: 'Bu Çeyrek', value: 'this-quarter' },
+      ]}
+    />
+    ```
+  </Step>
+
+  <Step title="Filtreler (Opsiyonel)">
+    Ek filtreler uygulayın.
+
+    ```tsx
+    <ReportFilters>
+      <Select label="Kontrol Tipi" />
+      <Select label="Lokasyon" />
+      <Select label="Sorumlu Kişi" />
+    </ReportFilters>
+    ```
+  </Step>
+
+  <Step title="Rapor Oluştur">
+    Raporu oluşturun ve önizleyin.
+
+    ```typescript
+    const { data: report } = await api.report.generate.mutate({
+      projectId: "clx123",
+      type: "MONTHLY_PROGRESS",
+      period: "2025-01",
+      filters: {
+        inspectionTypes: ["CONCRETE_POURING", "REBAR_INSPECTION"],
+      },
+    });
+    ```
+  </Step>
+
+  <Step title="Export">
+    PDF veya Excel olarak indirin.
+
+    ```tsx
+    <ExportButtons>
+      <Button onClick={() => exportPDF(report)}>
+        PDF İndir
+      </Button>
+      <Button onClick={() => exportExcel(report)}>
+        Excel İndir
+      </Button>
+    </ExportButtons>
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Otomatik Raporlama
+
+### Zamanlanmış Raporlar
+
+```typescript
+// Cron job ile otomatik rapor oluşturma
+import cron from 'node-cron';
+
+// Her Pazartesi sabahı 08:00'de haftalık rapor
+cron.schedule('0 8 * * 1', async () => {
+  const projects = await db.project.findMany({
+    where: { status: 'IN_PROGRESS' },
+  });
+
+  for (const project of projects) {
+    await api.report.generate({
+      projectId: project.id,
+      type: 'WEEKLY_QA_SUMMARY',
+      period: getCurrentWeek(),
+      autoSend: true,  // Email gönder
+    });
+  }
+});
+
+// Her ayın 1'inde aylık rapor
+cron.schedule('0 8 1 * *', async () => {
+  // Aylık rapor oluştur
+});
+```
+
+### Email ile Gönderim
+
+```typescript
+async function sendWeeklyReport(projectId: string) {
+  const report = await generateWeeklyReport(projectId);
+  const pdfUrl = await exportReportToPDF(report);
+
+  await sendEmail({
+    to: project.members.map(m => m.user.email),
+    subject: `${project.name} - Haftalık QA/QC Raporu`,
+    template: 'weekly-report',
+    attachments: [
+      {
+        filename: `Haftalik-Rapor-${report.period}.pdf`,
+        path: pdfUrl,
+      },
+    ],
+  });
+}
+```
+
+---
+
+## Dashboard ve Grafikler
+
+### Proje Dashboard
+
+```tsx
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BarChart, LineChart, PieChart } from 'recharts';
+
+function ProjectDashboard({ projectId }: { projectId: string }) {
+  const { data: stats } = api.project.getStats.useQuery({ projectId });
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI Cards */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Toplam Kontrol</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-3xl font-bold">{stats.totalInspections}</p>
+          <p className="text-sm text-gray-500">Bu ay: +15</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Açık NCR</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-3xl font-bold text-red-600">{stats.openDefects}</p>
+          <p className="text-sm text-gray-500">Kritik: {stats.criticalDefects}</p>
+        </CardContent>
+      </Card>
+
+      {/* Diğer KPI'lar */}
+    </div>
+  );
+}
+```
+
+### Kontrol İstatistikleri
+
+```tsx
+function InspectionStats({ data }: { data: InspectionData[] }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Kontrol Tipi Dağılımı</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <BarChart width={600} height={300} data={data}>
+          <XAxis dataKey="type" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="count" fill="#16a34a" />
+        </BarChart>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### NCR Trend Analizi
+
+```tsx
+function DefectTrendChart({ data }: { data: TrendData[] }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Uygunsuzluk Trend Analizi</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <LineChart width={800} height={400} data={data}>
+          <XAxis dataKey="week" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="opened" stroke="#dc2626" name="Açılan" />
+          <Line type="monotone" dataKey="closed" stroke="#16a34a" name="Kapatılan" />
+        </LineChart>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### Severity Dağılımı
+
+```tsx
+function SeverityDistribution({ data }: { data: SeverityData[] }) {
+  const COLORS = {
+    CRITICAL: '#dc2626',
+    HIGH: '#ea580c',
+    MEDIUM: '#f59e0b',
+    LOW: '#3b82f6',
+  };
+
+  return (
+    <PieChart width={400} height={400}>
+      <Pie
+        data={data}
+        cx={200}
+        cy={200}
+        labelLine={false}
+        label={renderCustomLabel}
+        outerRadius={150}
+        fill="#8884d8"
+        dataKey="value"
+      >
+        {data.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={COLORS[entry.name]} />
+        ))}
+      </Pie>
+      <Tooltip />
+      <Legend />
+    </PieChart>
+  );
+}
+```
+
+---
+
+## PDF Export
+
+### PDF Oluşturma
+
+```typescript
+import PDFDocument from 'pdfkit';
+import { createWriteStream } from 'fs';
+
+async function generatePDFReport(report: Report) {
+  const doc = new PDFDocument({ size: 'A4', margin: 50 });
+  const stream = createWriteStream(`/tmp/report-${report.id}.pdf`);
+
+  doc.pipe(stream);
+
+  // Header
+  doc
+    .fontSize(20)
+    .text('SAHA KONTROL RAPORU', { align: 'center' })
+    .moveDown();
+
+  // Proje Bilgileri
+  doc
+    .fontSize(12)
+    .text(`Proje: ${report.project.name}`)
+    .text(`Dönem: ${report.period}`)
+    .text(`Rapor Tarihi: ${new Date().toLocaleDateString('tr-TR')}`)
+    .moveDown();
+
+  // Özet İstatistikler
+  doc.fontSize(14).text('Özet İstatistikler:', { underline: true });
+  doc
+    .fontSize(10)
+    .text(`Toplam Kontrol: ${report.content.summary.totalInspections}`)
+    .text(`Toplam NCR: ${report.content.summary.totalDefects}`)
+    .text(`Açık NCR: ${report.content.summary.openDefects}`)
+    .moveDown();
+
+  // Tablolar
+  doc.fontSize(14).text('Detaylı Veriler:', { underline: true });
+
+  // Add table (kullanılabilir library: pdfkit-table)
+  doc.table({
+    headers: ['Kontrol Tipi', 'Sayı', 'Başarı Oranı'],
+    rows: report.content.tables.inspectionStats.map(row => [
+      row.type,
+      row.count,
+      `${row.successRate}%`,
+    ]),
+  });
+
+  // Grafikler (chart'ı image olarak ekle)
+  const chartImage = await generateChartImage(report.content.charts);
+  doc.addPage().image(chartImage, { fit: [500, 400] });
+
+  doc.end();
+
+  await new Promise((resolve) => stream.on('finish', resolve));
+
+  // Upload to Blob storage
+  const fileBuffer = await readFile(`/tmp/report-${report.id}.pdf`);
+  const fileUrl = await uploadToBlob(fileBuffer, `reports/report-${report.id}.pdf`);
+
+  return fileUrl;
+}
+```
+
+### React-PDF Kullanımı
+
+```tsx
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 30,
+  },
+  header: {
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  section: {
+    margin: 10,
+    padding: 10,
+  },
+});
+
+function ReportPDF({ report }: { report: Report }) {
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.header}>SAHA KONTROL RAPORU</Text>
+
+        <View style={styles.section}>
+          <Text>Proje: {report.project.name}</Text>
+          <Text>Dönem: {report.period}</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text>Toplam Kontrol: {report.content.summary.totalInspections}</Text>
+          <Text>Toplam NCR: {report.content.summary.totalDefects}</Text>
+        </View>
+
+        {/* Diğer içerikler */}
+      </Page>
+    </Document>
+  );
+}
+
+// Download button
+function DownloadReportButton({ report }: { report: Report }) {
+  return (
+    <PDFDownloadLink
+      document={<ReportPDF report={report} />}
+      fileName={`rapor-${report.period}.pdf`}
+    >
+      {({ loading }) => (loading ? 'Hazırlanıyor...' : 'PDF İndir')}
+    </PDFDownloadLink>
+  );
+}
+```
+
+---
+
+## Excel Export
+
+### XLSX Kullanımı
+
+```typescript
+import * as XLSX from 'xlsx';
+
+async function exportToExcel(report: Report) {
+  const workbook = XLSX.utils.book_new();
+
+  // Özet sayfası
+  const summaryData = [
+    ['Metrik', 'Değer'],
+    ['Toplam Kontrol', report.content.summary.totalInspections],
+    ['Toplam NCR', report.content.summary.totalDefects],
+    ['Açık NCR', report.content.summary.openDefects],
+    ['Kapalı NCR', report.content.summary.closedDefects],
+  ];
+
+  const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+  XLSX.utils.book_append_sheet(workbook, summarySheet, 'Özet');
+
+  // Kontrol listesi sayfası
+  const inspectionsData = report.content.tables.recentInspections.map(inspection => ({
+    'Tarih': inspection.date,
+    'Tip': inspection.type,
+    'Lokasyon': inspection.location,
+    'Kontrol Eden': inspection.inspector,
+    'Durum': inspection.status,
+  }));
+
+  const inspectionsSheet = XLSX.utils.json_to_sheet(inspectionsData);
+  XLSX.utils.book_append_sheet(workbook, inspectionsSheet, 'Kontroller');
+
+  // NCR sayfası
+  const defectsData = report.content.tables.openDefects.map(defect => ({
+    'NCR Kodu': defect.code,
+    'Başlık': defect.title,
+    'Önem': defect.severity,
+    'Durum': defect.status,
+    'Açılma Tarihi': defect.createdAt,
+    'Sorumlu': defect.assignedTo,
+  }));
+
+  const defectsSheet = XLSX.utils.json_to_sheet(defectsData);
+  XLSX.utils.book_append_sheet(workbook, defectsSheet, 'NCR Listesi');
+
+  // Export
+  XLSX.writeFile(workbook, `rapor-${report.period}.xlsx`);
+}
+```
+
+---
+
+## Özel Raporlar
+
+### Kategori Bazlı NCR Analizi
+
+```typescript
+const { data: categoryAnalysis } = api.report.getNCRByCategory.useQuery({
+  projectId: "clx123",
+  period: "2025-01",
+});
+
+// Sonuç:
+{
+  categories: [
+    {
+      name: "Beton",
+      total: 18,
+      open: 5,
+      closed: 13,
+      avgResolutionDays: 4.2,
+    },
+    {
+      name: "Donatı",
+      total: 12,
+      open: 3,
+      closed: 9,
+      avgResolutionDays: 3.5,
+    },
+    // ...
+  ]
+}
+```
+
+### Lokasyon Bazlı Analiz
+
+```typescript
+const { data: locationAnalysis } = api.report.getInspectionsByLocation.useQuery({
+  projectId: "clx123",
+  startDate: new Date("2025-01-01"),
+  endDate: new Date("2025-01-31"),
+});
+
+// Heat map için kullanılabilir
+```
+
+### Kullanıcı Performans Raporu
+
+```typescript
+const { data: userPerformance } = api.report.getUserPerformance.useQuery({
+  projectId: "clx123",
+  userId: "user_123",
+  period: "2025-01",
+});
+
+// Sonuç:
+{
+  totalInspections: 45,
+  approvedInspections: 42,
+  rejectedInspections: 3,
+  avgInspectionTime: "25 dakika",
+  qualityScore: 93.3,  // %
+}
+```
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Rapor Düzeni" icon="table">
+    **Standart rapor yapısı:**
+
+    1. Kapak sayfası (proje adı, dönem, logo)
+    2. İçindekiler
+    3. Özet (Executive Summary)
+    4. Detaylı metrikler
+    5. Grafikler ve görselleştirmeler
+    6. Tablolar
+    7. Bulgular ve tavsiyeler
+    8. Ekler (detaylı listeler)
+  </Accordion>
+
+  <Accordion title="Görselleştirme" icon="chart-simple">
+    **Doğru grafik seçimi:**
+
+    - **Bar Chart**: Kategori karşılaştırma (kontrol tipleri, NCR kategorileri)
+    - **Line Chart**: Trend analizi (aylık NCR sayısı, ilerleme)
+    - **Pie Chart**: Dağılım (severity, durum)
+    - **Heat Map**: Lokasyon bazlı yoğunluk
+    - **Gantt Chart**: Zaman çizelgesi
+  </Accordion>
+
+  <Accordion title="Performans" icon="gauge-high">
+    - Büyük veri setlerinde pagination kullanın
+    - Raporları arka planda oluşturun (background job)
+    - Cache mekanizması kullanın
+    - Grafikler için lazy loading
+  </Accordion>
+
+  <Accordion title="Veri Güvenliği" icon="lock">
+    - Hassas verileri maskeyin
+    - Rol bazlı rapor erişimi
+    - Rapor indirme logları tutun
+    - Watermark ekleyin (PDF'lerde)
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## API Referansı
+
+### Rapor Oluşturma
+
+```typescript
+const report = await api.report.generate.mutate({
+  projectId: string;
+  type: ReportType;
+  period: string;            // "2025-01", "2025-W03"
+  filters?: {
+    inspectionTypes?: string[];
+    locations?: string[];
+    users?: string[];
+  };
+  format?: 'JSON' | 'PDF' | 'EXCEL';
+  autoSend?: boolean;        // Email gönder
+});
+```
+
+### İstatistik Alma
+
+```typescript
+const stats = await api.report.getProjectStats.useQuery({
+  projectId: string;
+  startDate: Date;
+  endDate: Date;
+  groupBy?: 'day' | 'week' | 'month';
+});
+```
+
+---
+
+## İleri Okuma
+
+<CardGroup cols={2}>
+  <Card title="Dashboard Örnekleri" icon="chart-mixed" href="/guides/dashboard">
+    Interaktif dashboard oluşturma
+  </Card>
+
+  <Card title="API Dokümantasyonu" icon="code" href="/api-reference/endpoints/reports">
+    Report API endpoints
+  </Card>
+</CardGroup>

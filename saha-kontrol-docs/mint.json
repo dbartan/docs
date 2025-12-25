@@ -1,0 +1,102 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Saha Kontrol Uygulaması",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#15803D",
+    "light": "#16A34A",
+    "dark": "#14532D",
+    "anchors": {
+      "from": "#15803D",
+      "to": "#16A34A"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/your-org/saha-kontrol"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Uygulamayı Aç",
+    "url": "https://saha-kontrol.vercel.app"
+  },
+  "tabs": [
+    {
+      "name": "API Referansı",
+      "url": "api-reference"
+    },
+    {
+      "name": "Rehberler",
+      "url": "guides"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "Topluluk",
+      "icon": "discord",
+      "url": "https://discord.gg/your-server"
+    },
+    {
+      "name": "Blog",
+      "icon": "newspaper",
+      "url": "https://blog.saha-kontrol.com"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Başlangıç",
+      "pages": [
+        "introduction",
+        "quick-start",
+        "architecture-overview"
+      ]
+    },
+    {
+      "group": "Temel Kavramlar",
+      "pages": [
+        "concepts/projects",
+        "concepts/documents",
+        "concepts/inspections",
+        "concepts/defects",
+        "concepts/reports"
+      ]
+    },
+    {
+      "group": "Rehberler",
+      "pages": [
+        "guides/setup-project",
+        "guides/create-inspection",
+        "guides/manage-defects",
+        "guides/generate-reports",
+        "guides/team-management"
+      ]
+    },
+    {
+      "group": "API Dokümantasyonu",
+      "pages": [
+        "api-reference/introduction",
+        "api-reference/authentication"
+      ]
+    },
+    {
+      "group": "Endpoints",
+      "pages": [
+        "api-reference/endpoints/projects",
+        "api-reference/endpoints/documents",
+        "api-reference/endpoints/inspections",
+        "api-reference/endpoints/defects",
+        "api-reference/endpoints/reports"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/your-org/saha-kontrol",
+    "linkedin": "https://linkedin.com/company/your-company",
+    "twitter": "https://twitter.com/your-handle"
+  }
+}

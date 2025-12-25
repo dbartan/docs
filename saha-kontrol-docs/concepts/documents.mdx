@@ -1,0 +1,532 @@
+---
+title: Doküman Yönetimi
+description: Merkezi doküman deposu, versiyon kontrolü ve QR kod erişimi
+icon: "file-lines"
+---
+
+## Doküman Sistemi
+
+**Doküman Yönetimi**, tüm proje dokümanlarının merkezi bir depoda organize edilmesini sağlar. Teknik çizimler, kalite planları, test raporları ve diğer kritik dokümanlar kolayca yüklenebilir, aranabilir ve sahada mobil cihazlardan erişilebilir.
+
+## Doküman Türleri
+
+### Desteklenen Dosya Formatları
+
+<CardGroup cols={3}>
+  <Card title="PDF" icon="file-pdf">
+    Teknik dokümanlar, raporlar
+    **Max: 10MB**
+  </Card>
+
+  <Card title="CAD Çizimleri" icon="compass-drafting">
+    DWG, DXF, DWF
+    **Max: 50MB**
+  </Card>
+
+  <Card title="Resimler" icon="image">
+    JPG, PNG, WEBP
+    **Max: 5MB**
+  </Card>
+
+  <Card title="Office Dokümanları" icon="file-word">
+    DOCX, XLSX, PPTX
+    **Max: 10MB**
+  </Card>
+
+  <Card title="Sıkıştırılmış" icon="file-zipper">
+    ZIP, RAR (otomatik açılmaz)
+    **Max: 100MB**
+  </Card>
+
+  <Card title="Video" icon="file-video">
+    MP4, MOV (nadiren)
+    **Max: 100MB**
+  </Card>
+</CardGroup>
+
+---
+
+## Doküman Kategorileri
+
+### 1. Teknik Çizimler
+
+<Tabs>
+  <Tab title="Mimari">
+    <Card title="ARCHITECTURAL_DRAWINGS" icon="building">
+      - Kat planları
+      - Kesitler
+      - Görünüşler
+      - Detaylar
+      - Revizyon çizimleri
+    </Card>
+  </Tab>
+
+  <Tab title="Statik">
+    <Card title="STRUCTURAL_DRAWINGS" icon="building-columns">
+      - Temel planları
+      - Kolon-kiriş detayları
+      - Donatı planları
+      - Betonarme detaylar
+      - Statik hesaplar
+    </Card>
+  </Tab>
+
+  <Tab title="MEP">
+    <Card title="MEP_DRAWINGS" icon="plug">
+      - Elektrik projeleri
+      - Mekanik tesisat
+      - Sıhhi tesisat
+      - Yangın sistemleri
+      - BMS/HVAC şemaları
+    </Card>
+  </Tab>
+</Tabs>
+
+### 2. Kalite Dokümanları
+
+- **QUALITY_PLANS**: Kalite kontrol planları
+- **TEST_PROCEDURES**: Test prosedürleri ve metodları
+- **SPECIFICATIONS**: Teknik özellikler
+- **MATERIAL_APPROVALS**: Malzeme onay formları
+- **CERTIFICATES**: Sertifikalar ve test raporları
+
+### 3. Diğer
+
+- **OTHER**: Kategori dışı dokümanlar
+
+---
+
+## Doküman Veri Yapısı
+
+```typescript
+interface Document {
+  id: string;
+  projectId: string;
+  title: string;                     // "3. Kat Mimari Plan - Rev. C"
+  category: DocumentCategory;        // ARCHITECTURAL_DRAWINGS
+  fileUrl: string;                   // S3/Blob URL
+  fileType: string;                  // "pdf", "dwg", "jpg"
+  fileSize: number;                  // bytes
+  version: string;                   // "1.0", "2.1", etc.
+  uploadedById: string;
+  uploadedBy: User;
+  qrCode?: string;                   // QR code URL
+  tags: string[];                    // ["3rd-floor", "revision-c", "final"]
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+---
+
+## Doküman Yükleme
+
+### Temel Yükleme
+
+<Steps>
+  <Step title="Dosya Seçimi">
+    Drag & drop veya dosya seçici ile dosya seçin.
+
+    ```tsx
+    <FileUpload
+      accept=".pdf,.dwg,.jpg,.png,.xlsx,.docx"
+      maxSize={10 * 1024 * 1024} // 10MB
+      onUpload={handleUpload}
+    />
+    ```
+  </Step>
+
+  <Step title="Metadata Girişi">
+    Doküman bilgilerini doldurun:
+
+    - Başlık
+    - Kategori
+    - Versiyon
+    - Etiketler
+  </Step>
+
+  <Step title="Yükleme">
+    Dosya Vercel Blob/S3'e yüklenir.
+
+    ```typescript
+    const { data: document } = await api.document.create.mutate({
+      projectId: "clx123",
+      title: "3. Kat Mimari Plan",
+      category: "ARCHITECTURAL_DRAWINGS",
+      fileUrl: uploadedFileUrl,
+      fileType: "pdf",
+      fileSize: file.size,
+      version: "1.0",
+      tags: ["3rd-floor", "architectural"]
+    });
+    ```
+  </Step>
+
+  <Step title="QR Kod Oluşturma">
+    Otomatik olarak QR kod oluşturulur.
+
+    ```typescript
+    const qrCode = await generateQRCode(document.id);
+    // QR kod sahada taranarak doküman hızlıca açılır
+    ```
+  </Step>
+</Steps>
+
+### API Kullanımı
+
+```typescript
+// Doküman yükleme
+import { useUploadThing } from "@/lib/uploadthing";
+
+function DocumentUpload({ projectId }: { projectId: string }) {
+  const { startUpload, isUploading } = useUploadThing("documentUploader");
+
+  const handleUpload = async (files: File[]) => {
+    const result = await startUpload(files);
+
+    // Veritabanına kaydet
+    await api.document.create.mutate({
+      projectId,
+      title: files[0].name,
+      category: selectedCategory,
+      fileUrl: result[0].url,
+      fileType: result[0].type,
+      fileSize: result[0].size,
+    });
+  };
+
+  return <Dropzone onDrop={handleUpload} />;
+}
+```
+
+---
+
+## Versiyon Kontrolü
+
+### Yeni Versiyon Yükleme
+
+```typescript
+// Aynı dokümanın yeni versiyonu
+await api.document.uploadNewVersion.mutate({
+  documentId: "doc_123",
+  fileUrl: newFileUrl,
+  version: "2.0",
+  changeNotes: "Beton kalitesi C30'dan C35'e güncellendi"
+});
+```
+
+### Versiyon Geçmişi
+
+```typescript
+// Tüm versiyonları listele
+const { data: versions } = api.document.getVersions.useQuery({
+  documentId: "doc_123"
+});
+
+// Versiyon timeline
+versions.map(v => (
+  <VersionCard
+    version={v.version}
+    uploadedAt={v.createdAt}
+    uploadedBy={v.uploadedBy.name}
+    notes={v.changeNotes}
+  />
+));
+```
+
+<Tip>
+  **Semantik Versiyon Kullanımı:**
+  - `1.0` → İlk yüklenme
+  - `1.1` → Minor değişiklik
+  - `2.0` → Major revizyon
+  - `2.1-RC` → Release candidate
+</Tip>
+
+---
+
+## Etiketleme (Tagging)
+
+### Neden Etiket Kullanmalı?
+
+Etiketler, dokümanları hızlı bulmayı kolaylaştırır:
+
+```typescript
+tags: [
+  "ground-floor",     // Kat
+  "foundation",       // Alan
+  "concrete",         // Malzeme
+  "approved",         // Durum
+  "2025-01",         // Tarih
+]
+```
+
+### Etiket Arama
+
+```typescript
+// "concrete" etiketi olan tüm dokümanlar
+const { data: concreteDocuments } = api.document.search.useQuery({
+  projectId: "clx123",
+  tags: ["concrete"]
+});
+
+// Çoklu etiket (AND)
+const { data: results } = api.document.search.useQuery({
+  tags: ["3rd-floor", "electrical", "approved"]
+});
+```
+
+### Öneri Sistemi
+
+```typescript
+// Sık kullanılan etiketler otomatik önerilir
+const { data: suggestedTags } = api.document.getSuggestedTags.useQuery({
+  projectId: "clx123"
+});
+
+// ["foundation", "concrete", "rebar", "formwork", "approved"]
+```
+
+---
+
+## QR Kod Sistemi
+
+### QR Kod Kullanımı
+
+QR kodlar, sahada doküman erişimini hızlandırır:
+
+1. **QR Kod Yazdır**: Doküman sayfasından QR kodu yazdırın
+2. **Sahada Yerleştir**: QR kodu sahada ilgili alana yapıştırın
+3. **Tara ve Aç**: Mobil cihazla QR'ı tarayın, doküman anında açılır
+
+<img src="/images/qr-code-scan.png" alt="QR Code Scanning" />
+
+### QR Kod Oluşturma
+
+```typescript
+import QRCode from 'qrcode';
+
+async function generateQRCode(documentId: string) {
+  const url = `${APP_URL}/documents/${documentId}`;
+
+  const qrCodeDataUrl = await QRCode.toDataURL(url, {
+    width: 300,
+    margin: 2,
+    errorCorrectionLevel: 'H',
+  });
+
+  // Upload QR code image
+  const qrCodeUrl = await uploadToBlob(qrCodeDataUrl);
+
+  return qrCodeUrl;
+}
+```
+
+### QR Kod Okuma
+
+```tsx
+import { QrReader } from 'react-qr-reader';
+
+function QRScanner() {
+  const router = useRouter();
+
+  const handleScan = (result: string | null) => {
+    if (result) {
+      // Extract document ID from URL
+      const documentId = extractDocumentId(result);
+      router.push(`/documents/${documentId}`);
+    }
+  };
+
+  return (
+    <QrReader
+      onResult={handleScan}
+      constraints={{ facingMode: 'environment' }}
+    />
+  );
+}
+```
+
+---
+
+## Doküman Görüntüleme
+
+### PDF Viewer
+
+```tsx
+import { Document, Page, pdfjs } from 'react-pdf';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+
+function PDFViewer({ fileUrl }: { fileUrl: string }) {
+  const [numPages, setNumPages] = useState<number>(0);
+
+  return (
+    <Document
+      file={fileUrl}
+      onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+    >
+      {Array.from(new Array(numPages), (_, i) => (
+        <Page key={i} pageNumber={i + 1} />
+      ))}
+    </Document>
+  );
+}
+```
+
+### CAD Viewer (DWG)
+
+```tsx
+// Autodesk Forge Viewer veya alternatif
+import ForgeViewer from '@/components/ForgeViewer';
+
+function CADViewer({ dwgUrl }: { dwgUrl: string }) {
+  return <ForgeViewer modelUrl={dwgUrl} />;
+}
+```
+
+### Resim Galerisi
+
+```tsx
+import ImageGallery from 'react-image-gallery';
+
+function ImageViewer({ images }: { images: string[] }) {
+  const galleryImages = images.map(url => ({
+    original: url,
+    thumbnail: url,
+  }));
+
+  return <ImageGallery items={galleryImages} />;
+}
+```
+
+---
+
+## Arama ve Filtreleme
+
+### Gelişmiş Arama
+
+```typescript
+const { data: results } = api.document.advancedSearch.useQuery({
+  projectId: "clx123",
+  query: "mimari plan",
+  category: "ARCHITECTURAL_DRAWINGS",
+  tags: ["3rd-floor"],
+  uploadedAfter: new Date("2025-01-01"),
+  uploadedBy: "user_123",
+  version: "2.0",
+});
+```
+
+### Filtre UI
+
+```tsx
+<DocumentFilters>
+  <CategoryFilter />
+  <TagFilter />
+  <DateRangeFilter />
+  <UploaderFilter />
+  <VersionFilter />
+</DocumentFilters>
+
+<DocumentList documents={filteredDocuments} />
+```
+
+---
+
+## Doküman İzinleri
+
+### Rol Bazlı Erişim
+
+| Rol            | Görüntüle | Yükle | Düzenle | Sil |
+|----------------|-----------|-------|---------|-----|
+| Super Admin    | ✅        | ✅    | ✅      | ✅  |
+| QA/QC Manager  | ✅        | ✅    | ✅      | ❌  |
+| Site Engineer  | ✅        | ✅    | ❌      | ❌  |
+| Observer       | ✅        | ❌    | ❌      | ❌  |
+
+### İzin Kontrolü
+
+```typescript
+export const documentRouter = createTRPCRouter({
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      // Check permission
+      if (ctx.session.user.role !== "SUPER_ADMIN") {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
+      return await ctx.db.document.delete({
+        where: { id: input.id },
+      });
+    }),
+});
+```
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Dosya Adlandırma" icon="signature">
+    Açıklayıcı ve tutarlı dosya adları kullanın:
+
+    ```
+    ✅ İyi:
+    - 3-Kat-Mimari-Plan-Rev-C.pdf
+    - Temel-Planı-A01-v2.1.dwg
+    - Kalite-Kontrol-Prosedürü-Beton.pdf
+
+    ❌ Kötü:
+    - plan.pdf
+    - son_versiyon.dwg
+    - 123.pdf
+    ```
+  </Accordion>
+
+  <Accordion title="Versiyon Yönetimi" icon="code-branch">
+    - Her revizyon için yeni versiyon oluşturun
+    - Değişiklik notlarını mutlaka yazın
+    - Eski versiyonları silmeyin (audit trail)
+    - Semantik versiyon kullanın
+  </Accordion>
+
+  <Accordion title="Etiketleme Stratejisi" icon="tags">
+    Tutarlı etiket sistemi:
+
+    ```
+    - Kat: ground-floor, 1st-floor, 2nd-floor
+    - Alan: foundation, structure, mep, facade
+    - Durum: draft, approved, superseded
+    - Tarih: 2025-01, 2025-02
+    ```
+  </Accordion>
+
+  <Accordion title="QR Kod Kullanımı" icon="qrcode">
+    - Kritik dokümanlar için QR kod kullanın
+    - QR kodları lamine ederek koruyun
+    - Sahada görünür yerlere yerleştirin
+    - Düzenli kontrol edin (yıpranma)
+  </Accordion>
+
+  <Accordion title="Dosya Boyutu" icon="weight-hanging">
+    - Büyük dosyaları sıkıştırın
+    - PDF/A kullanın (arşivleme için)
+    - Gereksiz yüksek çözünürlük kullanmayın
+    - CAD dosyalarını purge edin
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## İleri Okuma
+
+<CardGroup cols={2}>
+  <Card title="Kontrol Listeleri" icon="clipboard-check" href="/concepts/inspections">
+    Kontrollerde doküman kullanımı
+  </Card>
+
+  <Card title="API Referansı" icon="code" href="/api-reference/endpoints/documents">
+    Document API endpoints
+  </Card>
+</CardGroup>

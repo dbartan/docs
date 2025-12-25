@@ -1,0 +1,399 @@
+---
+title: Hızlı Başlangıç
+description: Saha Kontrol Uygulamasını 5 dakikada kurun ve çalıştırın
+---
+
+## Ön Gereksinimler
+
+Başlamadan önce sisteminizde aşağıdaki araçların kurulu olduğundan emin olun:
+
+<CodeGroup>
+
+```bash npm
+node --version  # v18.0.0 veya üzeri
+npm --version   # v9.0.0 veya üzeri
+```
+
+```bash pnpm
+node --version  # v18.0.0 veya üzeri
+pnpm --version  # v8.0.0 veya üzeri
+```
+
+```bash yarn
+node --version  # v18.0.0 veya üzeri
+yarn --version  # v1.22.0 veya üzeri
+```
+
+</CodeGroup>
+
+Ayrıca ihtiyacınız olanlar:
+- **PostgreSQL** veritabanı (veya Vercel Postgres hesabı)
+- **GitHub** hesabı (OAuth için)
+- **Vercel** hesabı (deployment için, opsiyonel)
+
+---
+
+## Adım 1: Projeyi Oluşturun
+
+Create T3 App kullanarak projeyi başlatın:
+
+<CodeGroup>
+
+```bash npm
+npx create-t3-app@latest saha-kontrol
+```
+
+```bash pnpm
+pnpm create t3-app saha-kontrol
+```
+
+```bash yarn
+yarn create t3-app saha-kontrol
+```
+
+</CodeGroup>
+
+### Seçenekleri İşaretleyin
+
+Kurulum sırasında şu seçenekleri seçin:
+
+- ✅ TypeScript
+- ✅ Tailwind CSS
+- ✅ tRPC
+- ✅ Prisma
+- ✅ NextAuth.js
+- ✅ App Router
+
+<Check>
+  Kurulum tamamlandığında `cd saha-kontrol` ile proje klasörüne girin.
+</Check>
+
+---
+
+## Adım 2: Bağımlılıkları Ekleyin
+
+Ek paketleri yükleyin:
+
+```bash
+npm install @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select \
+            @radix-ui/react-tabs @radix-ui/react-toast \
+            react-hook-form @hookform/resolvers zod \
+            date-fns recharts \
+            @uploadthing/react uploadthing \
+            sonner
+```
+
+shadcn/ui bileşenlerini ekleyin:
+
+```bash
+npx shadcn-ui@latest init
+```
+
+Gerekli bileşenleri yükleyin:
+
+```bash
+npx shadcn-ui@latest add button card input label select textarea \
+                                 dropdown-menu dialog tabs toast \
+                                 table badge avatar
+```
+
+---
+
+## Adım 3: Environment Variables
+
+`.env.example` dosyasını `.env` olarak kopyalayın:
+
+```bash
+cp .env.example .env
+```
+
+`.env` dosyasını düzenleyin:
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/saha_kontrol"
+
+# NextAuth
+NEXTAUTH_SECRET="your-super-secret-key-here"
+NEXTAUTH_URL="http://localhost:3000"
+
+# GitHub OAuth (opsiyonel)
+GITHUB_CLIENT_ID="your-github-client-id"
+GITHUB_CLIENT_SECRET="your-github-client-secret"
+
+# Uploadthing (dosya yükleme)
+UPLOADTHING_SECRET="your-uploadthing-secret"
+UPLOADTHING_APP_ID="your-uploadthing-app-id"
+
+# App Config
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+```
+
+<Warning>
+  **Önemli:** `.env` dosyasını asla git'e commit etmeyin. `.gitignore` dosyasında olduğundan emin olun.
+</Warning>
+
+### NextAuth Secret Oluşturma
+
+```bash
+openssl rand -base64 32
+```
+
+Çıktıyı `NEXTAUTH_SECRET` olarak kullanın.
+
+---
+
+## Adım 4: Prisma Schema
+
+`prisma/schema.prisma` dosyasını güncelleyin:
+
+```prisma
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  role          Role           @default(SITE_ENGINEER)
+  image         String?
+  phone         String?
+  title         String?
+  projects      ProjectMember[]
+  inspections   Inspection[]
+  defects       Defect[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+enum Role {
+  SUPER_ADMIN
+  QAQC_MANAGER
+  SITE_ENGINEER
+  OBSERVER
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  name        String
+  code        String          @unique
+  description String?
+  client      String
+  location    String
+  startDate   DateTime
+  endDate     DateTime?
+  status      ProjectStatus   @default(PLANNING)
+  members     ProjectMember[]
+  documents   Document[]
+  inspections Inspection[]
+  defects     Defect[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  role      String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId])
+}
+
+// ... diğer modeller (Document, Inspection, Defect, Report)
+```
+
+<Tip>
+  Tam Prisma schema için [GitHub repository](https://github.com/your-org/saha-kontrol/blob/main/prisma/schema.prisma)'yi inceleyin.
+</Tip>
+
+---
+
+## Adım 5: Veritabanını Oluşturun
+
+Prisma migration'larını çalıştırın:
+
+```bash
+npx prisma db push
+```
+
+Seed data ekleyin (opsiyonel):
+
+```bash
+npx prisma db seed
+```
+
+Prisma Studio ile veritabanını görüntüleyin:
+
+```bash
+npx prisma studio
+```
+
+<Check>
+  Tarayıcınızda `http://localhost:5555` adresinde Prisma Studio açılacaktır.
+</Check>
+
+---
+
+## Adım 6: Uygulamayı Çalıştırın
+
+Development server'ı başlatın:
+
+<CodeGroup>
+
+```bash npm
+npm run dev
+```
+
+```bash pnpm
+pnpm dev
+```
+
+```bash yarn
+yarn dev
+```
+
+</CodeGroup>
+
+Tarayıcınızda `http://localhost:3000` adresini açın.
+
+<img src="/images/login-screen.png" alt="Login Screen" />
+
+---
+
+## Adım 7: İlk Kullanıcı Oluşturun
+
+1. **Sign Up** sayfasına gidin
+2. Email ve şifrenizi girin
+3. "Kayıt Ol" butonuna tıklayın
+4. Dashboard'a yönlendirileceksiniz
+
+<Note>
+  İlk kullanıcı otomatik olarak **SUPER_ADMIN** rolü alır.
+</Note>
+
+---
+
+## Adım 8: İlk Projenizi Oluşturun
+
+1. Dashboard'da "**Yeni Proje**" butonuna tıklayın
+2. Proje bilgilerini doldurun:
+   - Proje Adı: "ABC Plaza İnşaatı"
+   - Proje Kodu: "PRJ-001"
+   - Müşteri: "ABC İnşaat A.Ş."
+   - Lokasyon: "İstanbul, Türkiye"
+   - Başlangıç Tarihi: Bugünün tarihi
+3. "**Oluştur**" butonuna tıklayın
+
+<Check>
+  Tebrikler! İlk projenizi oluşturdunuz. Artık doküman yükleme, kontrol listesi oluşturma ve uygunsuzluk kaydı yapabilirsiniz.
+</Check>
+
+---
+
+## Sonraki Adımlar
+
+<CardGroup cols={2}>
+  <Card
+    title="Proje Yönetimi"
+    icon="folder-open"
+    href="/concepts/projects"
+  >
+    Proje oluşturma ve yönetme hakkında daha fazla bilgi
+  </Card>
+
+  <Card
+    title="Kontrol Listesi Oluşturma"
+    icon="clipboard-check"
+    href="/guides/create-inspection"
+  >
+    İlk QA/QC kontrol listenizi oluşturun
+  </Card>
+
+  <Card
+    title="Doküman Yükleme"
+    icon="file-arrow-up"
+    href="/concepts/documents"
+  >
+    Teknik çizim ve dokümanları yönetin
+  </Card>
+
+  <Card
+    title="API Kullanımı"
+    icon="code"
+    href="/api-reference/introduction"
+  >
+    tRPC API endpoints'lerini keşfedin
+  </Card>
+</CardGroup>
+
+---
+
+## Sorun Giderme
+
+<AccordionGroup>
+  <Accordion title="Database connection hatası" icon="database">
+    **Çözüm:**
+    - PostgreSQL'in çalıştığından emin olun: `pg_isready`
+    - `DATABASE_URL` değişkeninin doğru olduğunu kontrol edin
+    - Firewall ayarlarını kontrol edin
+  </Accordion>
+
+  <Accordion title="NextAuth hatası" icon="shield-exclamation">
+    **Çözüm:**
+    - `NEXTAUTH_SECRET` değişkeninin tanımlı olduğundan emin olun
+    - `NEXTAUTH_URL` değişkeninin doğru olduğunu kontrol edin
+    - Tarayıcı çerezlerini temizleyin
+  </Accordion>
+
+  <Accordion title="Dosya yükleme çalışmıyor" icon="file-exclamation">
+    **Çözüm:**
+    - Uploadthing API anahtarlarının doğru olduğunu kontrol edin
+    - Dosya boyutunun limit içinde olduğundan emin olun (max 10MB)
+    - Network bağlantınızı kontrol edin
+  </Accordion>
+
+  <Accordion title="Tailwind stilleri yüklenmiyor" icon="paintbrush">
+    **Çözüm:**
+    - `tailwind.config.ts` dosyasını kontrol edin
+    - Dev server'ı yeniden başlatın: `npm run dev`
+    - `node_modules` klasörünü silin ve yeniden yükleyin
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Yardım ve Destek
+
+Hala sorun mu yaşıyorsunuz?
+
+<CardGroup cols={3}>
+  <Card title="Discord" icon="discord" href="https://discord.gg/saha-kontrol">
+    Canlı destek
+  </Card>
+
+  <Card title="GitHub Issues" icon="github" href="https://github.com/your-org/saha-kontrol/issues">
+    Bug bildirin
+  </Card>
+
+  <Card title="Email" icon="envelope" href="mailto:support@saha-kontrol.com">
+    Destek ekibi
+  </Card>
+</CardGroup>
