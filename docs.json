@@ -8,93 +8,39 @@
     "dark": "#15803D"
   },
   "favicon": "/favicon.svg",
-  "navigation": {
-    "languages": [
-      {
-        "language": "tr",
-        "groups": [
-          {
-            "group": "Kurumsal",
-            "pages": [
-              "hakkimda",
-              "iletisim"
-            ]
-          },
-          {
-            "group": "Hizmetler",
-            "pages": [
-              "hizmetler",
-              "hizmet-kalite-kontrol",
-              "hizmet-proje-yonetimi",
-              "hizmet-teknik-danismanlik"
-            ]
-          },
-          {
-            "group": "Projeler",
-            "pages": [
-              "shaker-consultancy-group",
-              "viceroy-hotel-residantal-bodrum",
-              "nikki-beach-bodrum",
-              "mandarin-oriental-bodrum",
-              "berggruen-bodrum",
-              "safir-house"
-            ]
-          },
-          {
-            "group": "Portföy",
-            "pages": [
-              "portfoy",
-              "portfolio-kopru"
-            ]
-          },
-          {
-            "group": "Blog",
-            "pages": [
-              "blog",
-              "blog-betonarme-katmanlari",
-              "blog-sektor-guncellemeleri"
-            ]
-          }
-        ]
-      },
-      {
-        "language": "en",
-        "groups": [
-          {
-            "group": "Corporate",
-            "pages": [
-              "about",
-              "contact"
-            ]
-          },
-          {
-            "group": "Services",
-            "pages": [
-              "services"
-            ]
-          },
-          {
-            "group": "Portfolio",
-            "pages": [
-              "portfolio",
-              "shaker-consultancy-group",
-              "viceroy-hotel-residantal-bodrum",
-              "nikki-beach-bodrum",
-              "mandarin-oriental-bodrum",
-              "berggruen-bodrum",
-              "safir-house"
-            ]
-          },
-          {
-            "group": "Blog",
-            "pages": [
-              "blog"
-            ]
-          }
-        ]
-      }
-    ]
-  },
+  "navigation": [
+    {
+      "group": "Corporate",
+      "pages": [
+        "about",
+        "contact"
+      ]
+    },
+    {
+      "group": "Services",
+      "pages": [
+        "services"
+      ]
+    },
+    {
+      "group": "Portfolio",
+      "pages": [
+        "portfolio",
+        "shaker-consultancy-group",
+        "viceroy-hotel-residantal-bodrum",
+        "nikki-beach-bodrum",
+        "mandarin-oriental-bodrum",
+        "berggruen-bodrum",
+        "safir-house"
+      ]
+    },
+    {
+      "group": "Blog",
+      "pages": [
+        "blog"
+      ]
+    }
+  ],
   "logo": {
     "light": "/logo/derya-bartan-logo-light.svg",
     "dark": "/logo/derya-bartan-logo.svg"
