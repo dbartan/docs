@@ -1,13 +1,20 @@
 {
   "$schema": "https://mintlify.com/docs.json",
+  "name": "Derya Bartan - QA/QC Manager",
   "theme": "mint",
-  "name": "Mint Starter Kit",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
-    "dark": "#15803D"
+    "dark": "#15803D",
+    "background": {
+      "dark": "#0D1117"
+    }
   },
   "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/derya-bartan-logo-light.svg",
+    "dark": "/logo/derya-bartan-logo.svg"
+  },
   "navigation": [
     {
       "group": "Corporate",
@@ -40,11 +47,5 @@
         "blog"
       ]
     }
-  ],
-  "logo": {
-    "light": "/logo/derya-bartan-logo-light.svg",
-    "dark": "/logo/derya-bartan-logo.svg"
-  },
-  "integrations": {
-  }
+  ]
 }
