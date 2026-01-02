@@ -17,9 +17,14 @@
   },
   "navigation": [
     {
-      "group": "Corporate",
+      "group": "About Me",
       "pages": [
-        "about",
+        "about"
+      ]
+    },
+    {
+      "group": "Contact",
+      "pages": [
         "contact"
       ]
     },
@@ -39,12 +44,6 @@
         "mandarin-oriental-bodrum",
         "berggruen-bodrum",
         "safir-house"
-      ]
-    },
-    {
-      "group": "Blog",
-      "pages": [
-        "blog"
       ]
     }
   ]
