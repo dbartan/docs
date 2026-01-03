@@ -5,59 +5,62 @@
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
-    "dark": "#15803D",
-    "background": {
-      "dark": "#0D1117"
-    }
+    "dark": "#15803D"
   },
   "favicon": "/favicon.svg",
   "logo": {
     "light": "/logo/derya-bartan-logo-light.svg",
     "dark": "/logo/derya-bartan-logo.svg"
   },
-  "navigation": [
-    {
-      "group": "Corporate",
-      "pages": [
-        "about",
-        "contact"
-      ]
-    },
-    {
-      "group": "Services",
-      "pages": [
-        "services"
-      ]
-    },
-    {
-      "group": "Portfolio",
-      "pages": [
-        "portfolio",
-        "shaker-consultancy-group",
-        "viceroy-hotel-residantal-bodrum",
-        "nikki-beach-bodrum",
-        "mandarin-oriental-bodrum",
-        "berggruen-bodrum",
-        "safir-house"
-      ]
-    },
-    {
-      "group": "Saha Kontrol Docs",
-      "pages": [
-        "saha-kontrol-docs/introduction",
-        "saha-kontrol-docs/quick-start",
-        "saha-kontrol-docs/architecture-overview",
-        {
-          "group": "Concepts",
-          "pages": [
-            "saha-kontrol-docs/concepts/projects",
-            "saha-kontrol-docs/concepts/inspections",
-            "saha-kontrol-docs/concepts/defects",
-            "saha-kontrol-docs/concepts/documents",
-            "saha-kontrol-docs/concepts/reports"
-          ]
-        }
-      ]
-    }
-  ]
+  "navigation": {
+    "languages": [
+      {
+        "language": "en",
+        "tabs": [
+          {
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Corporate",
+                "pages": ["about", "contact"]
+              },
+              {
+                "group": "Services",
+                "pages": ["services"]
+              },
+              {
+                "group": "Portfolio",
+                "pages": [
+                  "shaker-consultancy-group",
+                  "viceroy-hotel-residantal-bodrum",
+                  "nikki-beach-bodrum",
+                  "mandarin-oriental-bodrum",
+                  "berggruen-bodrum",
+                  "safir-house"
+                ]
+              },
+              {
+                "group": "Saha Kontrol Docs",
+                "pages": [
+                  "saha-kontrol-docs/introduction",
+                  "saha-kontrol-docs/quick-start",
+                  "saha-kontrol-docs/architecture-overview"
+                ]
+              },
+              {
+                "group": "Concepts",
+                "pages": [
+                  "saha-kontrol-docs/concepts/projects",
+                  "saha-kontrol-docs/concepts/inspections",
+                  "saha-kontrol-docs/concepts/defects",
+                  "saha-kontrol-docs/concepts/documents",
+                  "saha-kontrol-docs/concepts/reports"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }
