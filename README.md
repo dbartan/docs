@@ -1,4 +1,4 @@
-1# Derya Bartan - Kişisel Web Sitesi
+2# Derya Bartan - Kişisel Web Sitesi
 
 Bu site, Derya Bartan'ın özgeçmişi, sunduğu hizmetler, portföyü ve iletişim bilgilerini içermektedir.
 
