@@ -1,13 +1,12 @@
-1# Derya Bartan - Kişisel Web Sitesi
+1# Derya Bartan - Kişisel Web 
 
-Bu site, Derya Bartan'ın özgeçmişi, sunduğu hizmetler, portföyü ve iletişim bilgilerini içermektedir.
 
 ## Sayfalar
 - Hakkımda
 - Hizmetler
 - Portföy
 - İletişim
-
+ 
 Tüm içerik Türkçe hazırlanmıştır.
 
 ### Development
