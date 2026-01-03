@@ -33,18 +33,10 @@
         "berggruen-bodrum",
         "safir-house"
       ]
-    },
-    {
-      "group": "Blog",
-      "pages": [
-        "blog"
-      ]
     }
   ],
   "logo": {
     "light": "/logo/derya-bartan-logo-light.svg",
     "dark": "/logo/derya-bartan-logo.svg"
-  },
-  "integrations": {
   }
 }
