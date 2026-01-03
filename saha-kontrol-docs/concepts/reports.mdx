@@ -10,61 +10,7 @@ icon: "chart-line"
 
 ## Rapor Türleri
 
-<CardGroup cols={2}>
-  <Card title="Günlük Saha Raporu" icon="calendar-day">
-    **DAILY_SITE_REPORT**
-    - Günün aktiviteleri
-    - Yapılan kontroller
-    - Tespit edilen uygunsuzluklar
-    - Hava durumu
-    - İşçi sayısı
-    - Malzeme kullanımı
-  </Card>
 
-  <Card title="Haftalık QA/QC Özeti" icon="calendar-week">
-    **WEEKLY_QA_SUMMARY**
-    - Haftalık kontrol istatistikleri
-    - Onaylanan/reddedilen kontroller
-    - Yeni NCR'ler
-    - Kapatılan NCR'ler
-    - Trend analizi
-  </Card>
-
-  <Card title="Aylık İlerleme Raporu" icon="calendar">
-    **MONTHLY_PROGRESS**
-    - Proje ilerleme yüzdesi
-    - Kilometre taşları
-    - Bütçe kullanımı
-    - Kalite metrikleri
-    - Risk analizi
-  </Card>
-
-  <Card title="NCR Özet Raporu" icon="triangle-exclamation">
-    **NCR_SUMMARY**
-    - Toplam NCR sayısı
-    - Severity dağılımı
-    - Kategori bazlı analiz
-    - Ortalama kapanış süresi
-    - Tekrarlayan sorunlar
-  </Card>
-
-  <Card title="Kontrol Özet Raporu" icon="clipboard-check">
-    **INSPECTION_SUMMARY**
-    - Toplam kontrol sayısı
-    - Kontrol tipi dağılımı
-    - Başarı oranları
-    - Reddedilen kontroller
-    - Lokasyon bazlı analiz
-  </Card>
-
-  <Card title="Doküman Raporu" icon="file">
-    **DOCUMENT_REPORT**
-    - Toplam doküman sayısı
-    - Kategori dağılımı
-    - Versiyon geçmişi
-    - En çok erişilen dokümanlar
-  </Card>
-</CardGroup>
 
 ---
 
@@ -682,12 +628,4 @@ const stats = await api.report.getProjectStats.useQuery({
 
 ## İleri Okuma
 
-<CardGroup cols={2}>
-  <Card title="Dashboard Örnekleri" icon="chart-mixed" href="/guides/dashboard">
-    Interaktif dashboard oluşturma
-  </Card>
 
-  <Card title="API Dokümantasyonu" icon="code" href="/api-reference/endpoints/reports">
-    Report API endpoints
-  </Card>
-</CardGroup>
