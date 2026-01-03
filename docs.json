@@ -1,13 +1,20 @@
 {
   "$schema": "https://mintlify.com/docs.json",
+  "name": "Derya Bartan - QA/QC Manager",
   "theme": "mint",
-  "name": "Mint Starter Kit",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
-    "dark": "#15803D"
+    "dark": "#15803D",
+    "background": {
+      "dark": "#0D1117"
+    }
   },
   "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/derya-bartan-logo-light.svg",
+    "dark": "/logo/derya-bartan-logo.svg"
+  },
   "navigation": [
     {
       "group": "Corporate",
@@ -39,22 +46,18 @@
       "pages": [
         "saha-kontrol-docs/introduction",
         "saha-kontrol-docs/quick-start",
-        "saha-kontrol-docs/architecture-overview"
-      ]
-    },
-    {
-      "group": "Concepts",
-      "pages": [
-        "saha-kontrol-docs/concepts/projects",
-        "saha-kontrol-docs/concepts/inspections",
-        "saha-kontrol-docs/concepts/defects",
-        "saha-kontrol-docs/concepts/documents",
-        "saha-kontrol-docs/concepts/reports"
+        "saha-kontrol-docs/architecture-overview",
+        {
+          "group": "Concepts",
+          "pages": [
+            "saha-kontrol-docs/concepts/projects",
+            "saha-kontrol-docs/concepts/inspections",
+            "saha-kontrol-docs/concepts/defects",
+            "saha-kontrol-docs/concepts/documents",
+            "saha-kontrol-docs/concepts/reports"
+          ]
+        }
       ]
     }
-  ],
-  "logo": {
-    "light": "/logo/derya-bartan-logo-light.svg",
-    "dark": "/logo/derya-bartan-logo.svg"
-  }
+  ]
 }
