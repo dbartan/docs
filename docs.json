@@ -39,17 +39,17 @@
       "pages": [
         "saha-kontrol-docs/introduction",
         "saha-kontrol-docs/quick-start",
-        "saha-kontrol-docs/architecture-overview",
-        {
-          "group": "Concepts",
-          "pages": [
-            "saha-kontrol-docs/concepts/projects",
-            "saha-kontrol-docs/concepts/inspections",
-            "saha-kontrol-docs/concepts/defects",
-            "saha-kontrol-docs/concepts/documents",
-            "saha-kontrol-docs/concepts/reports"
-          ]
-        }
+        "saha-kontrol-docs/architecture-overview"
+      ]
+    },
+    {
+      "group": "Concepts",
+      "pages": [
+        "saha-kontrol-docs/concepts/projects",
+        "saha-kontrol-docs/concepts/inspections",
+        "saha-kontrol-docs/concepts/defects",
+        "saha-kontrol-docs/concepts/documents",
+        "saha-kontrol-docs/concepts/reports"
       ]
     }
   ],
